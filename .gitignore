@@ -1,0 +1,9 @@
+# macOS
+.DS_Store
+
+# Особисті / робочі файли — НЕ публікуємо (залишаються лише локально)
+greece_ticket.html
+greece_ticket.pdf
+checklist.html
+prompt_for_claude_code.md
+quest.html
