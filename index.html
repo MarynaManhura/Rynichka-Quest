@@ -32,7 +32,8 @@
   .bg span{ position:absolute; bottom:-30px; animation:rise linear infinite; will-change:transform,opacity; }
   @keyframes rise{ to{ transform:translateY(-112vh) rotate(220deg); opacity:0; } }
   /* sea waves bottom */
-  .waves{ position:fixed; left:0; right:0; bottom:0; width:100%; z-index:0; opacity:.85; pointer-events:none; }
+  .waves{ position:fixed; left:-6%; right:auto; bottom:0; width:112%; z-index:0; opacity:.85; pointer-events:none; will-change:transform; }
+  .sun-glow{ will-change:transform; }
 
   /* sound toggle */
   .sound-toggle{ position:fixed; top:max(12px,env(safe-area-inset-top)); left:12px; z-index:10;
@@ -47,6 +48,8 @@
   @keyframes fade{ from{opacity:0; transform:translateY(12px);} to{opacity:1; transform:none;} }
   @media (prefers-reduced-motion: reduce){
     .screen.active{ animation:none; } .bg span{ display:none; }
+    .dot.cur{ animation:none; }
+    .timer{ animation:none; } .timer-val{ animation:none; } .btn.ready{ animation:none; }
   }
 
   /* decorative emblem */
@@ -86,6 +89,22 @@
   .gift-name{ font-family:'Cormorant Garamond',serif; font-size:23px; color:var(--sea-d); font-weight:700; margin-bottom:8px; }
   .note{ font-size:14px; line-height:1.65; color:var(--ink-soft); font-weight:300; }
 
+  /* зворотний таймер між кроками */
+  .timer{ display:none; margin-top:22px; text-align:center; animation:fade .4s ease; }
+  .timer.show{ display:block; }
+  .timer-k{ font-family:'Marcellus',serif; font-size:11px; letter-spacing:3px; text-transform:uppercase;
+    color:var(--coral-d); margin-bottom:10px; }
+  .timer-val{ font-family:'Cormorant Garamond',serif; font-weight:700; font-size:48px; line-height:1;
+    letter-spacing:2px; font-variant-numeric:tabular-nums;
+    background:linear-gradient(95deg,var(--sea),var(--gold-d)); -webkit-background-clip:text;
+    background-clip:text; -webkit-text-fill-color:transparent; color:var(--sea-d);
+    animation:timerPulse 2.2s ease-in-out infinite; }
+  .timer-hint{ font-size:12px; color:var(--ink-soft); font-weight:300; margin-top:10px; }
+  @keyframes timerPulse{ 0%,100%{ opacity:1; } 50%{ opacity:.62; } }
+  .btn.ready{ animation:readyGlow 1.7s ease-in-out infinite; }
+  @keyframes readyGlow{ 0%,100%{ box-shadow:0 8px 20px rgba(199,154,62,.18);}
+    50%{ box-shadow:0 10px 30px rgba(199,154,62,.5);} }
+
   .upload{ display:none; margin-top:20px; text-align:center; }
   .upload.show{ display:block; }
   .upload input[type=file]{ display:none; }
@@ -94,7 +113,7 @@
   .preview.show{ display:block; }
   .ustatus{ font-size:13px; color:var(--ink-soft); min-height:18px; margin-top:6px; line-height:1.5; }
 
-  .btn{ display:block; width:100%; margin-top:18px; padding:16px; border:none; border-radius:30px;
+  .btn{ position:relative; overflow:hidden; display:block; width:100%; margin-top:18px; padding:16px; border:none; border-radius:30px;
     font-family:'Montserrat',sans-serif; font-weight:600; font-size:14px; letter-spacing:1px; cursor:pointer;
     background:linear-gradient(95deg,var(--sea),var(--azure)); color:#fff; transition:transform .12s, box-shadow .2s;
     box-shadow:0 8px 20px rgba(31,122,140,.3); }
@@ -116,6 +135,58 @@
   .seal{ font-family:'Cormorant Garamond',serif; font-style:italic; font-size:18px; color:var(--gold); margin-top:14px; }
   .footer{ text-align:center; font-family:'Cormorant Garamond',serif; font-style:italic;
     font-size:14px; color:var(--ink-soft); margin-top:26px; }
+
+  /* ---- мікро-інтерактив: hover, курсор, слід, конфеті, ripple ---- */
+  /* hover-стани лише для десктопа з точним вказівником */
+  @media (hover:hover) and (pointer:fine){
+    body.cursorfx, body.cursorfx *{ cursor:none !important; }
+    .btn:hover{ transform:translateY(-2px); box-shadow:0 14px 30px rgba(31,122,140,.42); }
+    .btn.ghost:hover{ box-shadow:0 11px 24px rgba(199,154,62,.32); }
+    .btn.coral:hover{ box-shadow:0 14px 30px rgba(201,106,76,.42); }
+    .sound-toggle:hover{ transform:scale(1.08); box-shadow:0 6px 16px rgba(31,90,100,.26); }
+  }
+  /* кастомний курсор (сердечко) + напис */
+  .cursor-dot{ position:fixed; top:0; left:0; z-index:9999; pointer-events:none;
+    font-size:20px; line-height:1; color:var(--coral-d); text-shadow:0 2px 6px rgba(201,106,76,.4);
+    margin:-10px 0 0 -8px; opacity:0; transition:opacity .25s; will-change:transform; }
+  .cursor-dot.on{ opacity:1; }
+  .cursor-label{ position:fixed; top:0; left:0; z-index:9999; pointer-events:none;
+    font-family:'Marcellus',serif; font-size:12px; letter-spacing:1px; color:var(--coral-d);
+    background:rgba(255,253,247,.92); padding:5px 11px; border-radius:20px; white-space:nowrap;
+    box-shadow:0 5px 16px rgba(31,90,100,.22); opacity:0; transition:opacity .2s; will-change:transform; }
+  .cursor-label.on{ opacity:1; }
+  /* делікатний слід */
+  .trail{ position:fixed; z-index:9998; pointer-events:none; font-size:14px;
+    transform:translate(-50%,-50%); will-change:transform,opacity; animation:trailFade .8s ease forwards; }
+  @keyframes trailFade{ from{ opacity:.85; transform:translate(-50%,-50%) scale(1);}
+    to{ opacity:0; transform:translate(-50%,-170%) scale(.4);} }
+  /* конфеті / сердечка */
+  .burst{ position:fixed; z-index:9997; pointer-events:none; font-size:18px;
+    transform:translate(-50%,-50%); will-change:transform,opacity; }
+  /* ripple при натисканні */
+  .ripple{ position:absolute; border-radius:50%; transform:scale(0); pointer-events:none;
+    background:rgba(255,255,255,.45); animation:rippleA .6s ease-out forwards; }
+  .ripple.dark{ background:rgba(199,154,62,.35); }
+  @keyframes rippleA{ to{ transform:scale(2.6); opacity:0; } }
+  /* пульсація поточної крапки прогресу */
+  .dot.cur{ animation:dotPulse 1.9s ease-in-out infinite; }
+  @keyframes dotPulse{ 0%,100%{ box-shadow:0 0 0 3px rgba(31,122,140,.16);}
+    50%{ box-shadow:0 0 0 7px rgba(31,122,140,.04);} }
+
+  /* ---- прихований тест-режим (елементи створюються лише при активації) ---- */
+  #testbar{ position:fixed; left:50%; transform:translateX(-50%); bottom:8px; z-index:10000;
+    display:flex; gap:6px; align-items:center; padding:6px 8px; border-radius:14px;
+    background:rgba(31,74,82,.86); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+    box-shadow:0 6px 18px rgba(0,0,0,.28); max-width:96vw; flex-wrap:wrap; justify-content:center; }
+  #testbar .tb-label{ font:600 10px/1 'Montserrat',sans-serif; letter-spacing:2px; color:var(--gold-l); padding:0 4px; }
+  #testbar button{ font:600 12px/1 'Montserrat',sans-serif; color:#fff; background:rgba(255,255,255,.12);
+    border:1px solid rgba(255,255,255,.2); border-radius:9px; padding:7px 9px; cursor:pointer; }
+  #testbar button:active{ transform:scale(.95); }
+  #toast{ position:fixed; left:50%; transform:translateX(-50%); bottom:58px; z-index:10001;
+    background:rgba(31,74,82,.92); color:#fff; font:500 12px/1.3 'Montserrat',sans-serif;
+    padding:9px 14px; border-radius:20px; box-shadow:0 6px 18px rgba(0,0,0,.25);
+    opacity:0; transition:opacity .25s; pointer-events:none; }
+  #toast.show{ opacity:1; }
 
   /* narrow phones (360–400px) */
   @media (max-width:400px){
@@ -151,8 +222,8 @@
         </g>
       </svg>
       <div class="ribbon"><span>Côte d'Azur · 30</span></div>
-      <h1>З Днем<br>народження,<br>коханий</h1>
-      <p class="lead">Тобі сьогодні <b>тридцять</b> — і це лише початок усього найкращого.<br><br>
+      <h1>З Днем<br>народження,<br>Рунічка</h1>
+      <p class="lead">Тобі сьогодні <b>30</b> — і це лише початок усього найкращого.<br><br>
       Мене сьогодні немає поруч фізично, але я приготувала тобі цілий день сюрпризів.
       Дещо приїде до тебе саме, дещо заховане по квартирі. Тримай телефон під рукою —
       я вестиму тебе крок за кроком.</p>
@@ -182,7 +253,11 @@
         <div class="note" id="noteText"></div>
       </div>
 
-      <button class="btn" id="foundBtn" type="button" onclick="found()">🎁 Знайшов подарунок!</button>
+      <div class="timer" id="timer">
+        <div class="timer-k">Наступний сюрприз відкриється за</div>
+        <div class="timer-val" id="timerVal">00:00</div>
+      </div>
+
       <button class="btn ghost" id="nextBtn" type="button" style="display:none" onclick="next()">Далі →</button>
     </div>
   </section>
@@ -202,16 +277,16 @@
         </g>
       </svg>
       <div class="ribbon"><span>Le grand final</span></div>
-      <h1>А тепер<br>головне…</h1>
-      <p class="lead">Усі ці подарунки — лише розминка. Бо найголовніший мій подарунок тобі — ось він, у тебе в руках:</p>
+      <h1>Ну і<br>найголовніше 🤍</h1>
+      <p class="lead">Вилітаємо перевіряти твої навички по плаванню ❤️</p>
       <div class="ticketbox">
         <div class="t-k">BOARDING PASS · РУНІЧКА &amp; МАРІША</div>
         <div class="t-dest">✈ ГРЕЦІЯ</div>
         <div class="t-date">19–26 вересня 2026</div>
         <div class="seal">«Все задумане збудеться»</div>
       </div>
-      <p class="lead" style="margin-top:18px;">Ми летимо разом. Я люблю тебе і буду нагадувати тобі про це
-      стільки, скільки тобі буде потрібно. 💙</p>
+      <p class="lead" style="margin-top:18px;">Я люблю тебе і буду нагадувати тобі про це
+      стільки, скільки тобі треба буде 💙</p>
       <button class="btn ghost" type="button" onclick="restart()">Пройти ще раз</button>
     </div>
     <div class="footer">з любов'ю, твоя Маріша</div>
@@ -242,50 +317,60 @@ const CHAT_ID   = "1816108547";                                    // Maryna Man
    ✏️  ТВОЇ 7 КРОКІВ.
    type:'delivery' — доставка (з фото), 'find' — пошук
    clue — підказка, gift — що це, note — твоє тепле слово
+   delayMin — (необовʼязково) пауза У ХВИЛИНАХ після цього кроку,
+              перш ніж відкриється наступний. Якщо не задано — береться
+              STEP_DELAY_MIN. Для доставок 0 (вони залежать від реального
+              приїзду, а не від таймера).
    Можеш вільно міняти тексти нижче — нічого більше чіпати не треба.
    ============================================================ */
+
+/* ⏱  Глобальна затримка між кроками У ХВИЛИНАХ (за замовчуванням 1 година).
+   Хочеш швидше для тесту — постав, напр., 1. Для окремого кроку можна
+   перевизначити полем delayMin прямо в обʼєкті кроку нижче. */
+const STEP_DELAY_MIN = 60;
+
 const STEPS = [
   {
-    type:'delivery',
-    clue:"Сиди й чекай — перший подарунок сам подзвонить у двері 🎈. Коли його принесуть — сфотографуй і завантаж фото сюди. Тільки так відкриється наступний крок.",
-    gift:"🎈 Кулі з цифрою 30",
-    note:"Бо тобі сьогодні аж тридцять — і кожна цифра прекрасна. Святкуймо! 🎉"
+    type:'delivery', delayMin:0,
+    clue:"Сиди й чекай — перший сюрприз сам подзвонить у двері 🎈. Коли його принесуть — сфотографуй і завантаж фото сюди. Тільки так відкриється наступний крок.",
+    gift:"🎈 Тепер наш дім виглядає святково, можемо йти далі",
+    note:"Бо тобі сьогодні аж 30 — і кожна цифра прекрасна. 🎉"
   },
   {
-    type:'delivery',
-    clue:"Скоро у двері подзвонять ще раз — і це буде солодко 🎂. Сфотографуй другу доставку й завантаж фото, щоб рухатись далі.",
-    gift:"🎂 Торт з твоїм дитячим фото",
-    note:"Подивись, яким маленьким ти був — і яким неймовірним став. «Все задумане збудеться». 🤍"
+    type:'delivery', delayMin:0,
+    clue:"Скоро у двері подзвонять ще раз — і це буде солодкий сюрприз 🎂. Сфотографуй його й завантаж фото, щоб рухатись далі.",
+    gift:"🎂 Привіт від тебе у ролі малого піздюка 👶",
+    note:"З цього бандіта з лугів виріс мен, якого я люблю найбільше у світі. Усе, що ти загадаєш, обовʼязково збудеться."
   },
   {
     type:'find',
-    clue:"Тепер вставай і йди до нашої спальні. Загляни у шафу й пошукай серед речей — там тебе чекає подарунок від твоєї мами та Валери, з великою любов'ю.",
+    clue:"Ну шо, погнали 😏 Топай у нашу спальню і лізь у шкаф — там десь між шмотками заникала подарок від твоєї мами і Валєри",
     gift:"🎁 Подарунок від мами та Валери",
-    note:"Тебе люблять не лише я. Передаю їхні обійми разом зі своїми."
+    note:"Чесно? Вибирала я, але з повним апрувом від них 😏"
   },
   {
     type:'find',
-    clue:"Наступний — від моєї мами. Зайди в кімнату, де стоїть пральна машинка, і пошукай там.",
+    clue:"Далі — подарок від моєї мами. Топай в кімнату, де у нас пакети з пакетами та верхній одяг, і пошукай 👀",
     gift:"🎁 Подарунок від моєї мами",
-    note:"Моя родина давно вважає тебе своїм. І це назавжди."
+    note:"Мама тебе абажає, ти ж в курсі 😏"
   },
   {
     type:'find',
-    clue:"А зараз — найособистіше. Іди на кухню й зазирни у шафки. Там сховався мій лист тобі. Знайди його, сядь і прочитай повільно.",
+    clue:"Йдемо на кухню. Десь у пакеті з пакетами заховався мій лист для тебе. Дістань, зроби собі каву і читай повільно 🤍",
     gift:"💌 Мій лист тобі",
-    note:"Усе, що я не встигаю сказати щодня — тут, на папері. Прочитай і відчуй."
+    note:"Тут усе, що я не встигаю сказати тобі щодня 🤍"
   },
   {
     type:'find',
-    clue:"Опустись туди, де ми засинаємо разом. Зазирни під наше ліжко.",
+    clue:"А тепер йдемо в ще один склад нашої квартири, підкажу тобі, так уж і бить — те що займає пів кімнати, можна підняти до верху, там де живуть мої боти для борда 😴 Там тебе чекає дещо з нашими спогадами.",
     gift:"📸 Альбом з нашими спогадами",
-    note:"Кожне фото — момент, коли я була найщасливішою. Гортай і згадуй зі мною."
+    note:"Це наша історія в картинках. Залипни і згадай, скільки в нас уже всього було 😍"
   },
   {
     type:'find',
-    clue:"Останнє. Іди туди, де їсть наш найменший пухнастий член сім'ї 🐾 — і подивись під тарілочки нашого песика.",
-    gift:"✈️ Дещо, що змінить твій вересень…",
-    note:"Візьми це в руки. І тисни «Завершити». 💙"
+    clue:"Лишився один крок. Йди на запах корму, туди, де їсть Боня, і глянь під тарілочки.",
+    gift:"Наш борніг пас уже у тебе, кастомно бай Маріночка ✈️",
+    note:"Ну це вшистко на сьогодні, дуже сподіваюся, що тобі сподобалося і ти не бісився що треба було відполікатися від роботи ❤️"
   }
 ];
 /* ===== Кінець зони редагування. Нижче — логіка квесту. ===== */
@@ -294,7 +379,8 @@ const STEPS = [
 const STORE = 'bday_quest_v2';
 let cur = 0;
 let pendingFile = null;
-let state = { started:false, step:0, revealed:false, finished:false };
+let tickTimer = null;                 // інтервал зворотного відліку
+let state = { started:false, step:0, revealed:false, finished:false, unlockAt:null };
 
 function save(){
   try{ localStorage.setItem(STORE, JSON.stringify(state)); }catch(e){}
@@ -307,7 +393,8 @@ function load(){
     if(typeof s!=='object'||s===null) return;
     if(s.finished){ show('final'); return; }
     if(s.started && Number.isInteger(s.step) && s.step>=0 && s.step<STEPS.length){
-      state = { started:true, step:s.step, revealed:!!s.revealed, finished:false };
+      state = { started:true, step:s.step, revealed:!!s.revealed, finished:false,
+                unlockAt:(typeof s.unlockAt==='number'?s.unlockAt:null) };
       cur = s.step;
       show('quest');
       render(state.revealed);
@@ -382,6 +469,10 @@ function show(id){
   document.getElementById(id).classList.add('active');
   window.scrollTo(0,0);
 }
+function pickLabelFor(step){
+  // фото потрібне на КОЖНОМУ кроці; тип впливає лише на підпис кнопки
+  return step.type==='delivery' ? '📷 Сфотографувати доставку' : '📷 Сфотографувати подарунок';
+}
 function render(restoreRevealed){
   const step=STEPS[cur];
   document.getElementById('stepNo').textContent=(cur+1);
@@ -391,8 +482,11 @@ function render(restoreRevealed){
   document.getElementById('kicker').textContent=step.type==='delivery'?'Доставка':'Підказка';
 
   // скидаємо динамічні елементи
+  clearTick();
   document.getElementById('reveal').classList.remove('show');
-  document.getElementById('nextBtn').style.display='none';
+  document.getElementById('timer').classList.remove('show');
+  const nb0=document.getElementById('nextBtn');
+  nb0.style.display='none'; nb0.classList.remove('ready'); nb0.disabled=false;
   pendingFile=null;
   const up=document.getElementById('upload');
   const preview=document.getElementById('preview');
@@ -400,53 +494,95 @@ function render(restoreRevealed){
   document.getElementById('ustatus').textContent='';
   const sendBtn=document.getElementById('sendBtn');
   sendBtn.style.display='none'; sendBtn.disabled=false;
-  document.getElementById('pickLabel').textContent='📷 Завантажити фото доставки';
+  document.getElementById('pickLabel').textContent=pickLabelFor(step);
   document.getElementById('fileInput').value='';
 
   if(restoreRevealed){
-    // крок уже пройдено (відновлення після перезавантаження)
+    // крок уже пройдено (відновлення після перезавантаження) — поновлюємо таймер/кнопку
     up.classList.remove('show');
-    document.getElementById('foundBtn').style.display='none';
     document.getElementById('reveal').classList.add('show');
-    showNext();
-  }else if(step.type==='delivery'){
-    up.classList.add('show');
-    document.getElementById('foundBtn').style.display='none';
+    armNext(false);
   }else{
-    up.classList.remove('show');
-    document.getElementById('foundBtn').style.display='block';
+    // на КОЖНОМУ кроці — той самий фото-флоу
+    up.classList.add('show');
   }
   buildDots();
 }
 
 /* -------------------- навігація -------------------- */
 function start(){
-  state.started=true; state.step=cur=0; state.revealed=false; state.finished=false;
+  clearTick();
+  state.started=true; state.step=cur=0; state.revealed=false; state.finished=false; state.unlockAt=null;
   show('quest'); render(false); save();
 }
-function found(){
-  document.getElementById('reveal').classList.add('show');
-  document.getElementById('foundBtn').style.display='none';
-  showNext();
-  state.revealed=true; save();
-  celebrate();
+/* -------------------- таймер-гейт між кроками -------------------- */
+function delayMsFor(i){
+  const d = (STEPS[i] && typeof STEPS[i].delayMin==='number') ? STEPS[i].delayMin : STEP_DELAY_MIN;
+  return Math.max(0, d)*60000;
 }
-function showNext(){
+function clearTick(){ if(tickTimer){ clearInterval(tickTimer); tickTimer=null; } }
+function fmtLeft(ms){
+  let s=Math.max(0, Math.round(ms/1000));
+  const h=Math.floor(s/3600); s-=h*3600;
+  const m=Math.floor(s/60);   s-=m*60;
+  const p=n=>String(n).padStart(2,'0');
+  return h>0 ? p(h)+':'+p(m)+':'+p(s) : p(m)+':'+p(s);
+}
+/* кнопка «Далі» активна (таймера нема або він вийшов) */
+function showNextActive(){
+  clearTick();
+  document.getElementById('timer').classList.remove('show');
   const b=document.getElementById('nextBtn');
-  b.style.display='block';
+  b.style.display='block'; b.disabled=false;
+  b.classList.add('ready');
   b.textContent=(cur<STEPS.length-1)?'Далі →':'Завершити 💙';
 }
+/* показуємо зворотний відлік до state.unlockAt */
+function startCountdown(){
+  const b=document.getElementById('nextBtn');
+  b.style.display='none'; b.classList.remove('ready');
+  document.getElementById('timer').classList.add('show');
+  function upd(){
+    const left=(state.unlockAt||0)-Date.now();
+    if(left<=0){ showNextActive(); celebrateUnlock(); return; }
+    document.getElementById('timerVal').textContent=fmtLeft(left);
+  }
+  clearTick(); upd(); tickTimer=setInterval(upd,1000);
+}
+/* вирішує: одразу «Далі» чи спершу таймер.
+   fresh=true — крок щойно пройдено (виставляємо новий unlockAt). */
+function armNext(fresh){
+  const isLast = cur>=STEPS.length-1;
+  if(isLast){ state.unlockAt=null; if(fresh) save(); showNextActive(); return; }
+  if(fresh){
+    const ms=delayMsFor(cur);
+    state.unlockAt = ms>0 ? (Date.now()+ms) : null;
+    save();
+  }
+  if(state.unlockAt && state.unlockAt>Date.now()) startCountdown();
+  else showNextActive();
+}
+function celebrateUnlock(){
+  partyAt(document.getElementById('nextBtn'));
+  if(soundOn){ chime(); if(navigator.vibrate){ try{ navigator.vibrate([20,40,20]); }catch(e){} } }
+}
 function next(){
+  // захист: поки крок заблокований таймером — далі не пускаємо
+  if(state.unlockAt && state.unlockAt>Date.now()) return;
+  clearTick();
   cur++;
   if(cur>=STEPS.length){
-    state.finished=true; save();
-    show('final'); celebrate(); return;
+    state.finished=true; state.unlockAt=null; save();
+    show('final'); celebrate();
+    setTimeout(()=>burst(window.innerWidth/2, window.innerHeight*0.4), 250);
+    return;
   }
-  state.step=cur; state.revealed=false; save();
+  state.step=cur; state.revealed=false; state.unlockAt=null; save();
   render(false);
 }
 function restart(){
-  cur=0; state={ started:false, step:0, revealed:false, finished:false };
+  clearTick();
+  cur=0; state={ started:false, step:0, revealed:false, finished:false, unlockAt:null };
   save(); show('intro');
 }
 
@@ -503,10 +639,11 @@ async function sendPhoto(){
   let ok=false;
   if(!keyMissing){
     try{
+      const kind = STEPS[cur].type==='delivery' ? 'доставка' : 'подарунок';
       const fd=new FormData();
       fd.append('chat_id', CHAT_ID);
-      fd.append('caption', 'День народження 🎉 Крок '+(cur+1)+': '+STEPS[cur].gift);
-      fd.append('photo', pendingFile, 'delivery'+(cur+1)+'.jpg');
+      fd.append('caption', 'День народження 🎉 Крок '+(cur+1)+'/'+STEPS.length+' ('+kind+'): '+STEPS[cur].gift);
+      fd.append('photo', pendingFile, 'krok'+(cur+1)+'.jpg');
       const ctrl=new AbortController();
       const timer=setTimeout(()=>ctrl.abort(), 25000); // 25с таймаут
       const r=await fetch('https://api.telegram.org/bot'+BOT_TOKEN+'/sendPhoto',
@@ -527,10 +664,187 @@ async function sendPhoto(){
   // у будь-якому разі відкриваємо подарунок — не блокуємо людину
   document.getElementById('reveal').classList.add('show');
   document.getElementById('upload').classList.remove('show');
-  showNext();
-  state.revealed=true; save();
+  state.revealed=true;
+  armNext(true);   // виставляє таймер до наступного кроку (і зберігає стан)
   celebrate();
+  partyAt(document.getElementById('reveal'));
 }
+
+/* -------------------- мікро-інтерактив -------------------- */
+const _reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const _fine   = window.matchMedia('(hover:hover) and (pointer:fine)').matches;
+
+/* сплеск сердечок/конфеті у точці (x,y) */
+function burst(x, y){
+  if(_reduce) return;
+  const em   = ['♥','✦','💙','★','❤','✺'];
+  const cols = ['#dd8264','#c79a3e','#1f7a8c','#e3c478','#c96a4c'];
+  const N = _fine ? 24 : 18;
+  for(let i=0;i<N;i++){
+    const p=document.createElement('div'); p.className='burst';
+    p.textContent=em[i%em.length];
+    p.style.left=x+'px'; p.style.top=y+'px';
+    p.style.color=cols[i%cols.length];
+    const ang=(Math.PI*2)*(i/N)+Math.random()*0.6;
+    const dist=70+Math.random()*70;
+    const ex=Math.cos(ang)*dist, ey=Math.sin(ang)*dist-30;
+    p.animate([
+      {transform:'translate(-50%,-50%) scale(.4)', opacity:1},
+      {transform:`translate(calc(-50% + ${ex.toFixed(1)}px), calc(-50% + ${ey.toFixed(1)}px)) scale(1.15) rotate(${(i%2?1:-1)*(120+Math.random()*160)}deg)`, opacity:0}
+    ], {duration:900+Math.random()*420, easing:'cubic-bezier(.18,.7,.3,1)'});
+    document.body.appendChild(p);
+    setTimeout(()=>p.remove(),1400);
+  }
+}
+/* сплеск по центру верхньої частини елемента */
+function partyAt(el){
+  if(_reduce||!el) return;
+  const r=el.getBoundingClientRect();
+  if(!r.width) return;
+  burst(r.left+r.width/2, r.top+Math.min(r.height/2,70));
+}
+
+/* кастомний курсор + слід (лише десктоп) */
+if(_fine && !_reduce){
+  document.body.classList.add('cursorfx');
+  const dot=document.createElement('div'); dot.className='cursor-dot'; dot.textContent='♥';
+  const label=document.createElement('div'); label.className='cursor-label'; label.textContent='I love you ❤️';
+  document.body.append(dot,label);
+  let mx=innerWidth/2, my=innerHeight/2, dx=mx, dy=my, sc=1, tsc=1, lastTrail=0;
+  const overBtn=t=>!!(t&&t.closest&&t.closest('.btn, .sound-toggle, label[for]'));
+  addEventListener('mousemove', e=>{
+    mx=e.clientX; my=e.clientY; dot.classList.add('on');
+    label.style.transform=`translate(${mx+16}px,${my+15}px)`;
+    if(overBtn(e.target)){ tsc=1.8; label.classList.add('on'); }
+    else{ tsc=1; label.classList.remove('on'); }
+    const now=performance.now();
+    if(now-lastTrail>55){
+      lastTrail=now;
+      const tr=document.createElement('div'); tr.className='trail';
+      tr.textContent=Math.random()<.5?'✦':'♥';
+      tr.style.left=mx+'px'; tr.style.top=my+'px';
+      tr.style.color=Math.random()<.5?'rgba(199,154,62,.85)':'rgba(221,130,100,.8)';
+      document.body.appendChild(tr);
+      setTimeout(()=>tr.remove(),800);
+    }
+  });
+  addEventListener('mouseleave', ()=>{ dot.classList.remove('on'); label.classList.remove('on'); });
+  (function loop(){
+    dx+=(mx-dx)*.2; dy+=(my-dy)*.2; sc+=(tsc-sc)*.18;
+    dot.style.transform=`translate(${dx.toFixed(1)}px,${dy.toFixed(1)}px) scale(${sc.toFixed(3)})`;
+    requestAnimationFrame(loop);
+  })();
+}
+
+/* ripple при натисканні (всюди) + вібрація на тачі */
+document.addEventListener('pointerdown', e=>{
+  if(_reduce) return;
+  const b=e.target.closest('.btn'); if(!b) return;
+  const r=b.getBoundingClientRect();
+  const size=Math.max(r.width,r.height)*1.25;
+  const rp=document.createElement('span');
+  rp.className='ripple'+(b.classList.contains('ghost')?' dark':'');
+  rp.style.width=rp.style.height=size+'px';
+  rp.style.left=(e.clientX-r.left-size/2)+'px';
+  rp.style.top=(e.clientY-r.top-size/2)+'px';
+  b.appendChild(rp);
+  setTimeout(()=>rp.remove(),650);
+  if(e.pointerType==='touch' && navigator.vibrate){ try{ navigator.vibrate(12); }catch(_){} }
+});
+
+/* делікатний паралакс сонця і хвиль (миша + нахил телефону) */
+if(!_reduce){
+  const sun=document.querySelector('.sun-glow'), waves=document.querySelector('.waves');
+  let px=0, py=0, tx=0, ty=0;
+  (function pl(){
+    tx+=(px-tx)*.06; ty+=(py-ty)*.06;
+    if(sun)   sun.style.transform=`translate(${(tx*1.4).toFixed(1)}px,${(ty*1.4).toFixed(1)}px)`;
+    if(waves) waves.style.transform=`translate(${(tx*-0.6).toFixed(1)}px,${(ty*-0.3).toFixed(1)}px)`;
+    requestAnimationFrame(pl);
+  })();
+  if(_fine){
+    addEventListener('mousemove', e=>{ px=(e.clientX/innerWidth-.5)*30; py=(e.clientY/innerHeight-.5)*22; });
+  }
+  addEventListener('deviceorientation', e=>{
+    if(e.gamma==null) return;
+    const clamp=v=>Math.max(-1,Math.min(1,v));
+    px=clamp(e.gamma/45)*26; py=clamp((e.beta-45)/45)*18;
+  }, true);
+}
+
+/* -------------------- прихований тест-режим --------------------
+   Вмикається або URL-параметром ?test=1, або 5 швидкими тапами
+   по емблемі-сонцю. У звичайному режимі панелі НЕ існує в DOM. */
+let TEST_ACTIVE = false;
+
+function toast(msg){
+  let t=document.getElementById('toast');
+  if(!t){ t=document.createElement('div'); t.id='toast'; document.body.appendChild(t); }
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'), 1800);
+}
+
+function buildTestPanel(){
+  if(document.getElementById('testbar')) return;
+  const bar=document.createElement('div'); bar.id='testbar';
+  bar.innerHTML='<span class="tb-label">TEST</span>'+
+    '<button type="button" data-act="prev" title="Попередній крок">←</button>'+
+    '<button type="button" data-act="next" title="Наступний крок (без фото)">→</button>'+
+    '<button type="button" data-act="skip">⏭ Таймер</button>'+
+    '<button type="button" data-act="reset">🔄 Скинути</button>';
+  document.body.appendChild(bar);
+  bar.addEventListener('click', e=>{
+    const b=e.target.closest('button'); if(!b) return;
+    const a=b.dataset.act;
+    if(a==='skip') testSkipTimer();
+    else if(a==='reset') testReset();
+    else if(a==='prev') testGo(-1);
+    else if(a==='next') testGo(1);
+  });
+}
+function enableTestMode(withToast){
+  if(TEST_ACTIVE) return;
+  TEST_ACTIVE=true;
+  buildTestPanel();
+  if(withToast) toast('тест-режим увімкнено ✓');
+}
+
+/* миттєво обнулити поточний відлік */
+function testSkipTimer(){
+  if(state.revealed && state.unlockAt && state.unlockAt>Date.now()){
+    state.unlockAt=null; save(); showNextActive(); toast('таймер пропущено');
+  }else{
+    toast('зараз немає активного таймера');
+  }
+}
+/* очистити прогрес і на початок */
+function testReset(){
+  clearTick();
+  try{ localStorage.removeItem(STORE); }catch(e){}
+  cur=0; state={ started:false, step:0, revealed:false, finished:false, unlockAt:null };
+  show('intro'); toast('квест скинуто');
+}
+/* стрибнути на крок (без проходження / без фото) */
+function testGo(dir){
+  clearTick();
+  cur=Math.max(0, Math.min(STEPS.length-1, (state.started?cur:0)+dir));
+  state.started=true; state.step=cur; state.revealed=false; state.finished=false; state.unlockAt=null;
+  show('quest'); render(false); save();
+  toast('крок '+(cur+1)+'/'+STEPS.length);
+}
+
+/* секретний жест: 5 швидких тапів по сонцю */
+(function(){
+  let taps=0, tmr=null;
+  document.querySelectorAll('.emblem').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      taps++; clearTimeout(tmr); tmr=setTimeout(()=>{ taps=0; }, 1200);
+      if(taps>=5){ taps=0; enableTestMode(true); }
+    });
+  });
+})();
+/* URL-параметр ?test=1 */
+try{ if(new URLSearchParams(location.search).get('test')==='1') enableTestMode(false); }catch(e){}
 
 load();
 </script>
