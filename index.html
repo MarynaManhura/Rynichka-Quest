@@ -58,6 +58,8 @@
   .ribbon span{ display:inline-block; font-family:'Marcellus',serif; font-size:11px; letter-spacing:4px;
     text-transform:uppercase; color:var(--gold); border-top:1px solid var(--gold);
     border-bottom:1px solid var(--gold); padding:5px 14px; }
+  /* фраза-плашка на привітанні — без верхнього регістру, читабельніше */
+  .ribbon span.ribbon-intro{ text-transform:none; letter-spacing:1.5px; font-size:13px; }
 
   .dots{ display:flex; gap:8px; justify-content:center; margin-bottom:20px; flex-wrap:wrap; }
   .dot{ width:9px; height:9px; border-radius:50%; background:rgba(31,74,82,.18); transition:.3s; }
@@ -134,7 +136,7 @@
   .ticketbox .t-date{ font-size:13px; color:var(--ink-soft); }
   .seal{ font-family:'Cormorant Garamond',serif; font-style:italic; font-size:18px; color:var(--gold); margin-top:14px; }
   .footer{ text-align:center; font-family:'Cormorant Garamond',serif; font-style:italic;
-    font-size:14px; color:var(--ink-soft); margin-top:26px; }
+    font-size:14px; line-height:1.5; color:var(--ink-soft); margin:26px auto 0; max-width:320px; }
 
   /* ---- мікро-інтерактив: hover, курсор, слід, конфеті, ripple ---- */
   /* hover-стани лише для десктопа з точним вказівником */
@@ -221,7 +223,7 @@
           </g>
         </g>
       </svg>
-      <div class="ribbon"><span>Côte d'Azur · 30</span></div>
+      <div class="ribbon"><span class="ribbon-intro">Дував лі ти.....?❤️</span></div>
       <h1>З Днем<br>народження,<br>Рунічка</h1>
       <p class="lead">Тобі сьогодні <b>30</b> — і це лише початок усього найкращого.<br><br>
       Мене сьогодні немає поруч фізично, але я приготувала тобі цілий день сюрпризів.
@@ -229,7 +231,7 @@
       я вестиму тебе крок за кроком.</p>
       <button class="btn" type="button" onclick="start()">Почати подорож ✦</button>
     </div>
-    <div class="footer">зроблено з любов'ю · Маріша</div>
+    <div class="footer">зроблено з любов'ю від Маріночики 💗 надіюсь обійдемся без багів, але не обіцяю</div>
   </section>
 
   <!-- QUEST -->
@@ -289,7 +291,7 @@
       стільки, скільки тобі треба буде 💙</p>
       <button class="btn ghost" type="button" onclick="restart()">Пройти ще раз</button>
     </div>
-    <div class="footer">з любов'ю, твоя Маріша</div>
+    <div class="footer">зроблено з любов'ю від Маріночики 💗 надіюсь обійдемся без багів, але не обіцяю</div>
   </section>
 </div>
 
